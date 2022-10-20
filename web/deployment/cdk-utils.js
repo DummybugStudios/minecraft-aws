@@ -22,6 +22,12 @@ async function getStackResources() {
     return await client.describeStackResources({ StackName: cdkStack.StackName })
 }
 
+function findByLogicalId(stackResources, id)
+{
+    return stackResources.StackResources.find(x => x.LogicalResourceId === id)
+
+}
+
 async function getAPIUrl()
 {
     if (config.url) {
@@ -29,7 +35,7 @@ async function getAPIUrl()
     }
 
     let stackResources = await getStackResources()
-    let apiFunction  = stackResources.StackResources.find(x => x.LogicalResourceId === config.apiFunction)
+    let apiFunction  = findByLogicalId(stackResources, config.apiFunction)
     let lambda = new Lambda()
     let url = await lambda.getFunctionUrlConfig({FunctionName: apiFunction.PhysicalResourceId}).then(x=>x.FunctionUrl)
     config.url = url
@@ -38,6 +44,15 @@ async function getAPIUrl()
     return url
 }
 
+async function getWebsiteBucketName() {
+    let stackResources = await getStackResources()
+    // return stackResources
+    let bucket = findByLogicalId(stackResources, config.bucket)
+    return bucket.PhysicalResourceId
+
+}
+
 module.exports = {
-    getAPIUrl: getAPIUrl
+    getAPIUrl: getAPIUrl,
+    getWebsiteBucketName,
 }
