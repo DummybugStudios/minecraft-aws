@@ -1,12 +1,7 @@
 // import path from 'path'
 const path = require('path')
 const webpack = require('webpack')
-
-var apiURL; 
-function setupAPI() {
-    apiURL = process.env.API
-}
-setupAPI();
+const config = require("./cdkconfig.json")
 
 module.exports = {
     entry: './src/index.js',
@@ -16,7 +11,7 @@ module.exports = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            __API__: apiURL
+            __API__: JSON.stringify(config.url)
         })
     ]
 }
