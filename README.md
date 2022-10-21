@@ -12,5 +12,5 @@ To contribute, it is quite easy you just have to be a freaking jacked up chimp b
 
 ## List of Contributing Chimps 
 
-* Leader Chimp Siddartha
+* Leader Chimp Steven
 * Chimpdam
