@@ -29,9 +29,11 @@ export class BackendStack extends cdk.Stack {
     ecsTask.addContainer("minecraft-server-image", {
       image: ecs.ContainerImage.fromRegistry("registry.hub.docker.com/marctv/minecraft-papermc-server:latest"),
       environment: {
-        "MEMORYSIZE":'1.5G'
+        "MEMORYSIZE":'1536M'
       },
       memoryReservationMiB: 1536, // 1.5GiG
+      portMappings: [{containerPort: 25565, hostPort:25565}],
+      logging:ecs.LogDriver.awsLogs({streamPrefix:"ecs"})
     })
 
     // Create ECS Service and security groups
