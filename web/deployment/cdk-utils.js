@@ -1,5 +1,6 @@
 const { CloudFormation } = require('@aws-sdk/client-cloudformation')
 const {Lambda} = require("@aws-sdk/client-lambda")
+const {S3} = require("@aws-sdk/client-s3")
 const config = require('../cdkconfig.json')
 
 const fs = require('fs')
@@ -49,10 +50,18 @@ async function getWebsiteBucketName() {
     // return stackResources
     let bucket = findByLogicalId(stackResources, config.bucket)
     return bucket.PhysicalResourceId
+}
 
+async function getWebsiteURL() {
+    let bucketName = await getWebsiteBucketName()
+    let s3 = new S3()
+    let website = await s3.getBucketLocation({Bucket: bucketName})
+    let region = website.LocationConstraint
+    return `${bucketName}.s3-website.${region}.amazonaws.com`
 }
 
 module.exports = {
-    getAPIUrl: getAPIUrl,
+    getAPIUrl,
     getWebsiteBucketName,
+    getWebsiteURL,
 }

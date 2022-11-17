@@ -13,6 +13,6 @@ module.exports = {
         new webpack.DefinePlugin({
             __API__: JSON.stringify(config.url)
         })
-    ]
+    ],
 }
 

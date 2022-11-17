@@ -2,8 +2,9 @@
   "devDependencies": {
     "@aws-sdk/client-cloudformation": "^3.192.0",
     "@aws-sdk/client-lambda": "^3.192.0",
-    "@aws-sdk/client-s3": "^3.192.0",
+    "@aws-sdk/client-s3": "^3.212.0",
     "@aws-sdk/util-endpoints": "^3.192.0",
+    "mime-types": "^2.1.35",
     "s3-sync-client": "^3.0.3",
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0"

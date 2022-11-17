@@ -1,0 +1,60 @@
+body {
+    background-color:rgb(48, 48, 48);
+    font-family: roboto;
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100vh;
+}
+
+h1 {
+    display: block;
+    font-size: 200px;
+    margin:0;
+}
+
+h3 {
+    color: white;
+    font-size: 40px;
+}
+
+.running {
+    color: rgb(105, 251, 105);
+}
+
+.notrunning {
+    color: rgb(255, 91, 91);
+}
+
+.intermediate {
+    color: rgb(255, 219, 91);
+}
+
+#button {
+    font-size: 5vmin;
+    margin-bottom: 10vh;
+}
+
+button { 
+    background: rgb(37, 95, 140);
+    padding: 1em 2em;
+    color: white;
+    border-radius: 20px;
+    font-family: roboto;
+    cursor:pointer;
+    user-select: none;
+    border-style: none;
+}
+button:active
+{ 
+    background:rgb(31, 78, 114)
+}
+button:disabled
+{
+    display: none;
+}
