@@ -5,13 +5,11 @@ import {
   aws_s3_deployment as s3deploy,
   aws_lambda as lambda,
 } from 'aws-cdk-lib'
-import {Function } from 'aws-cdk-lib/aws-lambda';
-
 import { Construct } from 'constructs';
 
 export class BackendStack extends cdk.Stack {
 
-  public apiFunction : Function;
+  public apiFunction : lambda.Function;
   public bucket: s3.Bucket;
 
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
