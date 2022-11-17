@@ -43,10 +43,14 @@ export class BackendStack extends cdk.Stack {
     })
 
     ecsSecurityGroup.addIngressRule(
-      ec2.Peer.anyIpv4(), ec2.Port.tcp(25565), "Minecraft server"
+      ec2.Peer.anyIpv4(), ec2.Port.tcp(25565), "Minecraft - tcp"
+    )
+    ecsSecurityGroup.addIngressRule(
+      ec2.Peer.anyIpv4(), ec2.Port.udp(25565), "Minecraft - udp"
     )
 
-    new ecs.FargateService(this, "minecraft-server-service", {
+
+    const ecsService = new ecs.FargateService(this, "minecraft-server-service", {
       taskDefinition: ecsTask,
       cluster: ecsCluster,
       assignPublicIp: true,
@@ -63,6 +67,14 @@ export class BackendStack extends cdk.Stack {
       handler: 'index.handler',
       code: lambda.Code.fromAsset("../lambda/")
     })
+
+    apiFunctions.addEnvironment("cluster", ecsCluster.clusterArn)
+    apiFunctions.addEnvironment("service", ecsService.serviceName)
+    apiFunctions.addToRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ['ec2:*', "ecs:*"],
+      resources: ['*']
+    }))
 
     apiFunctions.addFunctionUrl({
       authType: lambda.FunctionUrlAuthType.NONE,
