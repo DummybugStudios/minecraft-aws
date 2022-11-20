@@ -1,5 +1,5 @@
 
-const stack_name = "CdkStack"
+const stack_name = "Minecraft"
 const docker_image = "registry.hub.docker.com/marctv/minecraft-papermc-server:latest"
 
 export {

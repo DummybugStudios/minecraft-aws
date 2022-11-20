@@ -9,7 +9,7 @@ const path = require('path')
 async function getStackResources() {
     let client = new CloudFormation()
     let stacks = await client.listStacks({})
-    let cdkStackFilter = stacks.StackSummaries.filter(x => x.StackName === "CdkStack" && x.DeletionTime === undefined)
+    let cdkStackFilter = stacks.StackSummaries.filter(x => x.StackName === config.stackName && x.DeletionTime === undefined)
     if (cdkStackFilter.length === 0) {
         throw new Error("Could not find CdkStack. Have you deployed it?")
     }

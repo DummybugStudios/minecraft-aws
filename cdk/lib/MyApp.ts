@@ -3,28 +3,30 @@ import * as cxapi from 'aws-cdk-lib/cx-api'
 import { Function} from 'aws-cdk-lib/aws-lambda';
 import * as fs from 'fs'
 import * as path from 'path'
+import * as config from '../config';
 
 export class MyApp extends cdk.App {
     public apiFunction: Function
     public bucket: cdk.aws_s3.Bucket
 
     synth(options?: cdk.StageSynthesisOptions | undefined): cxapi.CloudAssembly {
-        let value = super.synth(options)
+        const value = super.synth(options)
 
-        let functionArtifact = value.tryGetArtifact('CdkStack')
-        let logicalIds = functionArtifact?.manifest.metadata;
+        const functionArtifact = value.tryGetArtifact(config.stack_name)
+        const logicalIds = functionArtifact?.manifest.metadata;
 
         // TODO: put this in a function just get it working for now
-        let apiFunctionLogicalId = logicalIds?.[`/${this.apiFunction.node.path}/Resource`]
+        const apiFunctionLogicalId = logicalIds?.[`/${this.apiFunction.node.path}/Resource`]
             .find(x => x.type === 'aws:cdk:logicalId')
             ?.data
 
-        let bucketLogicalId = logicalIds?.[`/${this.bucket.node.path}/Resource`]
+        const bucketLogicalId = logicalIds?.[`/${this.bucket.node.path}/Resource`]
             .find(x => x.type === 'aws:cdk:logicalId')
             ?.data
         
 
-        let data = {
+        const data = {
+            stackName: config.stack_name,
             apiFunction: apiFunctionLogicalId,
             bucket: bucketLogicalId
         }
