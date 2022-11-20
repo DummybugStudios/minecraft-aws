@@ -5,8 +5,11 @@ import {
   aws_lambda as lambda,
   aws_ecs as ecs,
   aws_ec2 as ec2,
+  aws_efs as efs,
 } from 'aws-cdk-lib'
 import { Construct } from 'constructs';
+
+import * as config from "../config"
 
 export class BackendStack extends cdk.Stack {
 
@@ -16,25 +19,11 @@ export class BackendStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+
+    
+
     // Create ECS cluster
-    const ecsCluster = new ecs.Cluster(this, "miencraft-server-cluster")
-
-    // create ECS task
-    const ecsTask = new ecs.TaskDefinition(this, "minecraft-server-task", {
-      compatibility: ecs.Compatibility.EC2_AND_FARGATE,
-      cpu: "1024",
-      memoryMiB: "2048",
-    })
-
-    ecsTask.addContainer("minecraft-server-image", {
-      image: ecs.ContainerImage.fromRegistry("registry.hub.docker.com/marctv/minecraft-papermc-server:latest"),
-      environment: {
-        "MEMORYSIZE":'1536M'
-      },
-      memoryReservationMiB: 1536, // 1.5GiG
-      portMappings: [{containerPort: 25565, hostPort:25565}],
-      logging:ecs.LogDriver.awsLogs({streamPrefix:"ecs"})
-    })
+    const ecsCluster = new ecs.Cluster(this, "minecraft-server-cluster")
 
     // Create ECS Service and security groups
 
@@ -50,7 +39,56 @@ export class BackendStack extends cdk.Stack {
     ecsSecurityGroup.addIngressRule(
       ec2.Peer.anyIpv4(), ec2.Port.udp(25565), "Minecraft - udp"
     )
+    ecsSecurityGroup.addIngressRule(
+      ec2.Peer.anyIpv4(), ec2.Port.tcp(efs.FileSystem.DEFAULT_PORT), "EFS"
+    )
 
+    // Create cloud file system in the same VPC
+    const gameData = new efs.FileSystem(this, "minecraft-file-system", {
+      vpc: ecsCluster.vpc,
+      securityGroup: ecsSecurityGroup
+    })
+
+    const gameDataVolume = {
+      name: 'gameDataVolume',
+      efsVolumeConfiguration: {
+        fileSystemId: gameData.fileSystemId,
+      }
+    }
+
+    // create ECS task
+    const ecsTask = new ecs.TaskDefinition(this, "minecraft-server-task", {
+      compatibility: ecs.Compatibility.EC2_AND_FARGATE,
+      cpu: "1024",
+      memoryMiB: "2048",
+    })
+
+    ecsTask.addToTaskRolePolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: ["ssmmessages:CreateControlChannel",
+      "ssmmessages:CreateDataChannel",
+      "ssmmessages:OpenControlChannel",
+      "ssmmessages:OpenDataChannel"],
+      resources: ['*']
+    }))
+
+    ecsTask.addVolume(gameDataVolume)
+
+    const container = ecsTask.addContainer("minecraft-server-image", {
+      image: ecs.ContainerImage.fromRegistry(config.docker_image),
+      environment: {
+        "MEMORYSIZE":'1536M'
+      },
+      memoryReservationMiB: 1536, // 1.5GiG
+      portMappings: [{containerPort: 25565, hostPort:25565}],
+      logging:ecs.LogDriver.awsLogs({streamPrefix:"ecs"}),
+    })
+
+    container.addMountPoints({
+      containerPath: "/data",
+      readOnly: false,
+      sourceVolume: "gameDataVolume"
+    })
 
     const ecsService = new ecs.FargateService(this, "minecraft-server-service", {
       taskDefinition: ecsTask,
@@ -60,7 +98,7 @@ export class BackendStack extends cdk.Stack {
       minHealthyPercent: 100,
       maxHealthyPercent: 200,
       securityGroups: [ecsSecurityGroup],
-      //TODO: enableExecuteCommand: true,
+      enableExecuteCommand: true,
     })
 
     // Create lambda function
@@ -72,6 +110,7 @@ export class BackendStack extends cdk.Stack {
 
     apiFunctions.addEnvironment("cluster", ecsCluster.clusterArn)
     apiFunctions.addEnvironment("service", ecsService.serviceName)
+    //TODO: Don't allow everything please, only what you need.
     apiFunctions.addToRolePolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: ['ec2:*', "ecs:*"],

@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { MyApp } from '../lib/MyApp';
 import { BackendStack } from '../lib/backend-stack';
 
+import { MyApp } from '../lib/MyApp';
+
+import * as config from '../config'
+
+console.log(config.stack_name)
 const app = new MyApp();
-const backend = new BackendStack(app, 'CdkStack', {
+const backend = new BackendStack(app, config.stack_name, {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
