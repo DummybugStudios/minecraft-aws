@@ -6,6 +6,7 @@ import {
   aws_ecs as ecs,
   aws_ec2 as ec2,
   aws_efs as efs,
+  RemovalPolicy,
 } from 'aws-cdk-lib'
 import { Construct } from 'constructs';
 
@@ -46,7 +47,8 @@ export class BackendStack extends cdk.Stack {
     // Create cloud file system in the same VPC
     const gameData = new efs.FileSystem(this, "minecraft-file-system", {
       vpc: ecsCluster.vpc,
-      securityGroup: ecsSecurityGroup
+      securityGroup: ecsSecurityGroup,
+      removalPolicy: RemovalPolicy.DESTROY,
     })
 
     const gameDataVolume = {
@@ -127,7 +129,9 @@ export class BackendStack extends cdk.Stack {
     
     // Create website bucket
     const websiteBucket = new s3.Bucket(this, "minecraft-website-bucket", {
-      websiteIndexDocument: "index.html"
+      websiteIndexDocument: "index.html",
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
     });
     
 
