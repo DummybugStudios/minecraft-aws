@@ -21,15 +21,20 @@ export class BackendStack extends cdk.Stack {
     super(scope, id, props);
 
 
-    
+    // Create VPC
+    const vpc = new ec2.Vpc(this, "minecraft-vpc", {
+      natGateways: 0,
+    })
 
     // Create ECS cluster
-    const ecsCluster = new ecs.Cluster(this, "minecraft-server-cluster")
+    const ecsCluster = new ecs.Cluster(this, "minecraft-server-cluster", {
+      vpc: vpc
+    })
 
     // Create ECS Service and security groups
 
     const ecsSecurityGroup = new ec2.SecurityGroup(this, "minecraft-security-group", {
-      vpc: ecsCluster.vpc,
+      vpc: vpc,
       description: "Security group used by the minecraft ecs service",
       allowAllOutbound: true
     })
@@ -46,7 +51,7 @@ export class BackendStack extends cdk.Stack {
 
     // Create cloud file system in the same VPC
     const gameData = new efs.FileSystem(this, "minecraft-file-system", {
-      vpc: ecsCluster.vpc,
+      vpc: vpc,
       securityGroup: ecsSecurityGroup,
       removalPolicy: RemovalPolicy.DESTROY,
     })
