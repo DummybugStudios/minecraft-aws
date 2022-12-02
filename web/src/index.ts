@@ -1,4 +1,5 @@
 import api from "./api";
+import "./style.css"
 
 var state = {
     status: "Unknown",

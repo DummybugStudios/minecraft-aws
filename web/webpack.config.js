@@ -3,7 +3,6 @@ const path = require('path')
 const webpack = require('webpack')
 const config = require("./cdkconfig.json")
 const HTMLWebpackPlugin = require("html-webpack-plugin")
-const CopyWebpackPlugin = require("copy-webpack-plugin")
 
 module.exports = {
     entry: './src/index.ts',
@@ -21,6 +20,10 @@ module.exports = {
             {
                 test: /\.html$/,
                 use: 'html-loader'
+            },
+            {
+                test: /\.css$/i,
+                use: ['style-loader', 'css-loader']
             }
         ],
     },
@@ -33,15 +36,9 @@ module.exports = {
             __DEV__: process.env.DEV || false,
         }),
         new HTMLWebpackPlugin({
-            template: 'src/index.html'
+            template: 'src/index.html',
+            favicon: "assets/favicon.ico"
         }),
-        new CopyWebpackPlugin({
-            patterns:[
-                {
-                    from: 'assets/favicon.ico',
-                }
-            ]
-        })
     ],
 }
 
