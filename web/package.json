@@ -16,6 +16,7 @@
   },
   "scripts": {
     "build": "node setup-build.js && webpack",
+    "devbuild":"DEV=true webpack",
     "deploy": "node deployment/deploy.js"
   }
 }

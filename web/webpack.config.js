@@ -21,7 +21,8 @@ module.exports = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            __API__: JSON.stringify(config.url)
+            __API__: JSON.stringify(config.url),
+            __DEV__: process.env.DEV || false,
         })
     ],
 }

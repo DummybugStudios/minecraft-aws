@@ -1,4 +1,4 @@
-import { getServerStatus, startServer, stopServer } from "./api";
+import api from "./api";
 
 var state = {
     status: "Unknown",
@@ -49,24 +49,24 @@ async function handleButtonClick(event :any) {
     // Only do something if the current view is not out of date 
     // otherwise just update the page with the new state
     event.target.disabled = true;
-    let newState = await getServerStatus();
+    let newState = await api.getServerStatus();
     if (state.status !== newState.status || state.ip !== newState.ip) {
         state = newState;
         main();
         return;
     }
     if (state.status == "Running") {
-        stopServer()
+        api.stopServer()
     }
     else if (state.status === "Stopped") {
-        startServer()
+        api.startServer()
     }
     main();
 }
 
 
 async function main() {
-    state = await getServerStatus();
+    state = await api.getServerStatus();
     if (["Starting", "Stopping"].includes(state.status)) {
         console.log("pooppy diapers");
         setTimeout(main, 2000);
