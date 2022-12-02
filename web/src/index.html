@@ -17,12 +17,15 @@
         <h3 id="ip"></h3>
         <button id="button" disabled>Start server</button>
     </div>
-    <div class="overlay">
+    <div class="disabled" id="overlay">
         <div class="inside">
-            <p>Are you sure you want this?</p>
-            <button>Yes</button>
-            <button>No</button>
+            <div class="inside-text" id="popup-text">Are you sure you want this?</div>
+            <div class="inside-buttons">
+                <button id="overlay-button-no">No</button>
+                <button id="overlay-button-yes">Yes</button>
+            </div>
         </div>
     </div>
 </body>
+
 </html>

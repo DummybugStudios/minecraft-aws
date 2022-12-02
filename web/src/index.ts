@@ -1,9 +1,45 @@
+import { ServiceException } from "@aws-sdk/client-lambda";
+import { Stats } from "webpack";
 import api from "./api";
 import "./style.css"
 
 var state = {
     status: "Unknown",
     ip: ""
+}
+
+let mainButton = document.getElementById("button") as HTMLButtonElement
+let overlay = document.getElementById("overlay")
+
+let overlayYesButton = document.getElementById("overlay-button-yes")
+
+overlay.onclick = hideOverlay;
+overlayYesButton.onclick = handleOverlayButtonClick
+mainButton.onclick = handleButtonClick;
+
+
+class StateMismatchError extends Error{}
+
+// returns whether the server should be started or stopped
+// when the button is clicked
+// true -> start
+// false -> stop
+function shouldStart() : boolean {
+    switch (state.status) {
+        case "Running":
+            return false;
+        case "Stopped":
+            return true;
+    }
+}
+
+async function checkStateMismatch() {
+    let newState = await api.getServerStatus();
+    if (state.status !== newState.status || state.ip !== newState.ip) {
+        state = newState
+        main()
+        throw new StateMismatchError("Local state does not match remote state")
+    }
 }
 
 function changeStatus() {
@@ -28,44 +64,51 @@ function changeStatus() {
 
 }
 
-function changeButton() {
-    let button = document.getElementById("button") as HTMLButtonElement
+function changeMainButton() {
     switch (state.status) {
         case "Running":
-            button.innerHTML = "Stop Server"
-            button.disabled = false;
+            mainButton.innerHTML = "Stop Server"
+            mainButton.disabled = false;
             break
         case "Stopped":
-            button.innerHTML = "Start Server"
-            button.disabled = false;
+            mainButton.innerHTML = "Start Server"
+            mainButton.disabled = false;
             break
         default:
-            button.disabled = true
+            mainButton.disabled = true
             break
     }
 }
 
+function showOverlay() {
+    let text = `Are you sure you want to ${shouldStart() ? 'start' : 'stop'} the server`
+    let popupText = document.getElementById("popup-text")
+    popupText.innerHTML = text;
+    // rmeove the disabled class
+    overlay.className = ""
+}
 
-async function handleButtonClick(event :any) {
-    // Only do something if the current view is not out of date 
-    // otherwise just update the page with the new state
-    event.target.disabled = true;
-    let newState = await api.getServerStatus();
-    if (state.status !== newState.status || state.ip !== newState.ip) {
-        state = newState;
-        main();
-        return;
-    }
-    if (state.status == "Running") {
-        api.stopServer()
-    }
-    else if (state.status === "Stopped") {
+function hideOverlay() {
+    overlay.className = "disabled"
+}
+
+async function handleOverlayButtonClick() {
+    await checkStateMismatch(); 
+    let start = shouldStart()
+
+    if (start)
         api.startServer()
-    }
-    main();
+    else
+        api.stopServer()
+    main()
 }
 
 
+function handleButtonClick() {
+    showOverlay()
+}
+
+// TODO: fix the checking server status twice glitch
 async function main() {
     state = await api.getServerStatus();
     if (["Starting", "Stopping"].includes(state.status)) {
@@ -73,8 +116,7 @@ async function main() {
         setTimeout(main, 2000);
     }
     changeStatus();
-    changeButton();
+    changeMainButton();
 }
 
-document.getElementById("button").onclick = handleButtonClick;
 main();
