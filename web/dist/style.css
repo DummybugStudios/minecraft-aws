@@ -14,13 +14,13 @@ body {
 
 h1 {
     display: block;
-    font-size: 200px;
+    font-size: clamp(3rem, 15vmin, 10rem);
     margin:0;
 }
 
 h3 {
     color: white;
-    font-size: 40px;
+    font-size: clamp(1rem, 8vmin, 5rem);
 }
 
 .running {
@@ -37,7 +37,8 @@ h3 {
 
 #button {
     font-size: 5vmin;
-    margin-bottom: 10vh;
+    margin-top: 10vmin;
+    margin-bottom: 10vmin;
 }
 
 button { 
