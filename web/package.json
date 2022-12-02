@@ -19,7 +19,7 @@
   },
   "scripts": {
     "build": "node setup-build.js && webpack",
-    "devbuild": "DEV=true webpack",
+    "dev-build": "DEV=true webpack --mode development --watch ./src/",
     "deploy": "node deployment/deploy.js"
   }
 }
