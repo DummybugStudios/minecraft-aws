@@ -1,4 +1,4 @@
 node_modules/
 cdk.out/
-web/dist/main.js
+web/dist/
 web/cdkconfig.json
