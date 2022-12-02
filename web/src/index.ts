@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+declare var __API__ : string
+
 var url = __API__
 
 var state = {
@@ -30,7 +32,7 @@ function changeStatus() {
 }
 
 function changeButton() {
-    let button = document.getElementById("button")
+    let button = document.getElementById("button") as HTMLButtonElement
     switch (state.status) {
         case "Running":
             button.innerHTML = "Stop Server"
@@ -56,7 +58,7 @@ async function getServerStatus() {
     return { status: status, ip: ip }
 }
 
-async function handleButtonClick(event) {
+async function handleButtonClick(event :any) {
     // Only do something if the current view is not out of date 
     // otherwise just update the page with the new state
     event.target.disabled = true;
