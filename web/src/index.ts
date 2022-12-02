@@ -49,16 +49,19 @@ function changeStatus() {
 
     if (state.status === "Running") {
         element.className = "running"
+        ip.className = ""
         ip.innerHTML = state.ip
     }
 
     else if (state.status === "Stopped") {
         ip.innerHTML = ""
+        ip.className="disabled"
         element.className = "notrunning"
     }
 
     else {
         ip.innerHTML = ""
+        ip.className = "disabled"
         element.className = "intermediate"
     }
 

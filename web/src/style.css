@@ -72,8 +72,8 @@ button:disabled
     background: rgb(0,0,0,0.9);
 }
 
-#overlay.disabled{
-    display: none;
+.disabled{
+    display: none !important;
 }
 
 .inside {
