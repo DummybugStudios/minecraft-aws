@@ -1,8 +1,4 @@
-import axios from 'axios'
-
-declare var __API__ : string
-
-var url = __API__
+import { getServerStatus, startServer, stopServer } from "./api";
 
 var state = {
     status: "Unknown",
@@ -48,15 +44,6 @@ function changeButton() {
     }
 }
 
-async function getServerStatus() {
-    let { status, ip } = await axios({
-        method: 'get',
-        url: `${url}/status`,
-        withCredentials: false,
-    }).then(x => x.data)
-    
-    return { status: status, ip: ip }
-}
 
 async function handleButtonClick(event :any) {
     // Only do something if the current view is not out of date 
@@ -69,16 +56,10 @@ async function handleButtonClick(event :any) {
         return;
     }
     if (state.status == "Running") {
-        await axios({
-            method: 'get',
-            url: `${url}/stop`
-        })
+        stopServer()
     }
     else if (state.status === "Stopped") {
-        await axios({
-            method: 'get',
-            url: `${url}/start`
-        })
+        startServer()
     }
     main();
 }
