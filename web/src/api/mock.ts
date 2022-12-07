@@ -24,11 +24,13 @@ export default class MockAPI implements IApi {
     }
 
     async stopServer(): Promise<void> {
+        await wait(500)
         this.status = "Stopping"
         setTimeout(()=>{this.status = "Stopped"}, 4000)
     }
 
     async startServer(): Promise<void> {
+        await wait(500)
         this.status = "Starting"
         setTimeout(()=>{this.status="Running"}, 4000)
     }

@@ -96,13 +96,14 @@ function hideOverlay() {
 }
 
 async function handleOverlayButtonClick() {
+    mainButton.disabled=true;
     await checkStateMismatch(); 
     let start = shouldStart()
 
     if (start)
-        api.startServer()
+        await api.startServer()
     else
-        api.stopServer()
+        await api.stopServer()
     main()
 }
 
