@@ -43,6 +43,9 @@ export class BackendStack extends cdk.Stack {
       ec2.Peer.anyIpv4(), ec2.Port.tcp(25565), "Minecraft - tcp"
     )
     ecsSecurityGroup.addIngressRule(
+      ec2.Peer.anyIpv4(), ec2.Port.tcp(25575), "Minecraft - RCON"
+    )
+    ecsSecurityGroup.addIngressRule(
       ec2.Peer.anyIpv4(), ec2.Port.udp(25565), "Minecraft - udp"
     )
     ecsSecurityGroup.addIngressRule(
